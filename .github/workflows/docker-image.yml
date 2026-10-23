@@ -1,0 +1,49 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Log in to Docker Hub (or your container registry)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Step 3: Set up Docker Buildx (for advanced builds & caching)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 4: Build and push the Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: sharmasaravanan1109/movie-recommendation-app:latest # change the username and repo name accordingly
+
+      # Step 5 (Optional): Trigger deployment on your production server via SSH
+#     - name: Deploy to Remote Server
+#       uses: appleboy/ssh-action@master
+#       with:
+#         host: ${{ secrets.SERVER_HOST }}  # add these in the secrets in the settings
+#         username: ${{ secrets.SERVER_USER }}
+#         key: ${{ secrets.SERVER_SSH_KEY }}
+#         script: |
+#           docker pull sharmasaravanan1109/movie-recommendation-app:latest
+#           docker stop movie-recommendation-app || true
+#           docker rm movie-recommendation-app || true
+#           docker run -d --name my-app -p 80:80 sharmasaravanan1109/movie-recommendation-app:latest
+        
